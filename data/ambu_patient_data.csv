@@ -1,0 +1,144 @@
+patient_id,age,gender,condition,comorbidity,bpm,mode,peep,lpm,pulse,bp_systolic,bp_diastolic,gcs_score,cvs_score,spo2_before,spo2_5min,spo2_10min,spo2_15min,spo2_20min,spo2_25min,spo2_30min,outcome
+P0001,69,Female,Trauma,Diabetes,30,High,10,8.5,105,109,81,15,4,82,88,95,99,99,98,99,1
+P0002,32,Male,Respiratory Failure,COPD,25,High,10,5.0,82,104,78,13,4,84,87,90,97,99,99,98,1
+P0003,78,Female,Cardiac Arrest,Heart Disease,25,Low,5,13.7,85,163,100,3,1,58,63,70,70,75,76,75,0
+P0004,38,Male,Post-Surgical,,20,Assist Control,10,7.0,69,84,107,8,2,55,59,61,62,62,61,63,0
+P0005,41,Male,Respiratory Failure,Heart Disease,15,High,10,9.1,132,144,52,5,2,62,68,68,70,72,73,76,0
+P0006,20,Female,Respiratory Failure,COPD,25,Assist Control,0,13.8,130,173,105,13,4,83,84,88,87,87,90,91,1
+P0007,39,Female,Trauma,COPD,25,High,5,10.1,111,128,89,12,1,57,56,58,63,68,67,70,1
+P0008,70,Female,Stroke/CNS,COPD,30,High,10,3.5,122,82,83,9,2,86,90,94,94,98,99,99,1
+P0009,19,Female,Trauma,Heart Disease,20,Medium,15,14.2,75,124,89,12,1,64,67,68,71,72,76,75,0
+P0010,47,Female,Cardiac Arrest,COPD,20,Assist Control,10,10.2,115,93,76,4,1,64,62,66,65,69,73,76,0
+P0011,55,Female,Respiratory Failure,Heart Disease,25,Assist Control,10,6.4,122,109,62,4,1,73,79,79,80,81,82,85,0
+P0012,19,Female,Stroke/CNS,COPD,20,Low,0,3.8,122,147,94,15,5,88,94,94,94,99,99,98,1
+P0013,81,Female,Cardiac Arrest,Diabetes,30,Low,5,12.3,89,97,82,6,1,87,86,93,92,96,98,99,1
+P0014,77,Male,Cardiac Arrest,COPD,30,Medium,10,10.1,66,141,55,3,5,77,77,82,87,89,88,87,0
+P0015,38,Female,Post-Surgical,Heart Disease,20,High,5,8.9,50,116,73,5,4,82,84,85,88,91,93,96,1
+P0016,50,Female,Respiratory Failure,Hypertension,25,Assist Control,5,13.6,138,104,68,15,2,86,88,87,86,88,90,91,1
+P0017,75,Male,Respiratory Failure,COPD,25,Low,5,12.3,110,127,65,11,2,61,59,65,69,69,74,75,0
+P0018,39,Female,Post-Surgical,Hypertension,15,Medium,0,4.0,92,144,89,9,2,83,88,92,95,97,96,95,1
+P0019,66,Male,Post-Surgical,Diabetes,30,Medium,5,6.1,91,132,77,9,2,62,67,72,73,78,81,84,0
+P0020,76,Male,Stroke/CNS,,20,Assist Control,5,5.2,74,158,82,15,2,55,56,63,68,67,72,74,1
+P0021,59,Female,Drug Overdose,Diabetes,25,High,5,11.7,88,152,108,15,2,57,61,64,71,71,73,76,1
+P0022,77,Male,Cardiac Arrest,COPD,20,High,0,2.4,84,94,108,13,2,78,85,84,91,95,97,97,1
+P0023,32,Male,Respiratory Failure,Hypertension,30,Medium,15,9.4,52,128,97,6,4,77,77,85,92,92,95,99,1
+P0024,79,Male,Trauma,Hypertension,20,Medium,10,11.9,93,167,90,4,1,62,65,70,70,73,75,77,0
+P0025,79,Male,Trauma,Heart Disease,15,Medium,10,13.4,100,147,62,6,3,57,64,67,68,69,71,72,0
+P0026,64,Female,Drug Overdose,Hypertension,30,Low,15,6.4,61,91,92,8,5,87,94,95,99,99,99,99,1
+P0027,79,Male,Respiratory Failure,Heart Disease,15,Assist Control,10,12.7,68,138,94,13,3,82,88,95,98,99,99,99,1
+P0028,68,Female,Drug Overdose,,20,High,0,3.4,93,116,74,13,3,62,60,59,59,59,64,65,1
+P0029,72,Male,Drug Overdose,COPD,30,Assist Control,10,13.0,108,140,102,5,1,88,90,89,90,94,94,96,1
+P0030,81,Male,Post-Surgical,Heart Disease,30,Assist Control,10,3.7,98,122,91,3,1,89,90,89,93,97,99,99,1
+P0031,20,Male,Trauma,,25,Medium,10,7.2,110,149,85,14,1,86,91,92,97,99,99,99,1
+P0032,68,Male,Stroke/CNS,Hypertension,25,High,5,12.4,66,118,76,10,2,78,76,80,87,88,90,90,1
+P0033,24,Female,Stroke/CNS,Hypertension,20,Assist Control,0,3.9,123,135,87,14,4,68,74,82,81,87,92,95,1
+P0034,38,Female,Respiratory Failure,,20,High,5,5.0,106,142,109,15,2,86,89,90,95,99,99,99,1
+P0035,56,Male,Post-Surgical,Hypertension,20,Low,5,11.4,104,125,56,7,4,70,71,77,83,85,88,92,1
+P0036,35,Male,Post-Surgical,,25,Medium,10,11.4,96,167,54,7,4,58,64,72,73,77,78,82,0
+P0037,21,Female,Respiratory Failure,Heart Disease,25,Low,10,10.3,61,90,92,13,3,75,77,77,79,78,83,83,0
+P0038,77,Male,Respiratory Failure,Heart Disease,25,Assist Control,5,11.0,111,141,94,6,3,68,70,77,81,86,87,91,1
+P0039,31,Male,Respiratory Failure,,25,High,20,9.1,129,156,107,8,4,85,87,88,93,96,98,99,1
+P0040,26,Male,Respiratory Failure,Heart Disease,15,Low,10,5.3,137,177,106,5,4,72,70,73,75,76,80,79,0
+P0041,70,Female,Post-Surgical,Heart Disease,20,High,5,6.5,132,104,100,11,2,61,59,67,73,73,77,76,1
+P0042,19,Female,Cardiac Arrest,Heart Disease,15,High,0,4.4,57,150,80,7,2,64,69,75,78,79,84,83,0
+P0043,77,Female,Cardiac Arrest,Diabetes,20,Medium,5,13.8,70,131,72,5,3,61,66,66,65,65,68,68,0
+P0044,61,Male,Respiratory Failure,COPD,20,Low,5,9.6,130,83,91,13,1,87,90,94,96,97,99,99,1
+P0045,25,Male,Cardiac Arrest,Hypertension,30,High,5,7.2,136,138,59,3,4,77,78,81,82,82,86,87,0
+P0046,64,Female,Respiratory Failure,Diabetes,20,Medium,5,8.0,129,151,81,12,2,75,74,82,89,93,96,95,1
+P0047,52,Female,Trauma,Heart Disease,15,High,5,14.3,119,99,92,14,3,73,72,79,85,87,91,93,1
+P0048,53,Female,Trauma,,15,Medium,5,4.0,121,172,102,8,2,73,79,82,81,81,86,90,0
+P0049,67,Female,Respiratory Failure,Heart Disease,25,Assist Control,15,9.6,74,142,79,4,4,83,85,85,89,95,95,97,1
+P0050,21,Male,Respiratory Failure,COPD,25,Medium,0,8.6,131,133,88,15,4,72,73,76,83,83,87,91,1
+P0051,19,Female,Respiratory Failure,Heart Disease,15,Medium,10,9.9,138,153,80,5,5,56,63,65,70,69,70,69,0
+P0052,23,Male,Stroke/CNS,,15,Assist Control,5,2.2,61,177,67,3,1,55,53,58,60,60,63,62,0
+P0053,71,Female,Respiratory Failure,COPD,25,Medium,20,13.3,64,136,85,11,5,59,63,67,66,65,69,68,0
+P0054,21,Male,Stroke/CNS,Heart Disease,15,Low,0,14.1,108,169,51,10,3,74,74,74,74,77,81,81,0
+P0055,71,Female,Post-Surgical,COPD,25,Low,5,9.3,75,120,63,14,2,65,68,71,74,78,83,87,0
+P0056,80,Female,Respiratory Failure,Hypertension,25,High,20,11.1,75,82,62,4,3,56,58,63,66,65,68,68,0
+P0057,35,Female,Drug Overdose,Hypertension,15,High,15,14.0,96,85,78,14,4,57,59,64,70,72,72,72,0
+P0058,61,Female,Respiratory Failure,Heart Disease,15,High,15,11.2,81,84,61,13,5,77,79,82,86,91,96,99,1
+P0059,51,Male,Respiratory Failure,COPD,30,Low,5,4.0,59,84,88,10,5,66,64,71,77,81,81,83,0
+P0060,79,Female,Stroke/CNS,,20,Low,5,9.5,65,133,51,14,5,74,72,74,74,73,78,80,0
+P0061,31,Male,Stroke/CNS,Heart Disease,20,Low,10,9.9,120,126,81,11,3,59,59,60,61,65,68,69,1
+P0062,65,Male,Drug Overdose,Hypertension,25,Medium,20,7.5,66,166,62,3,4,84,91,93,97,99,98,98,1
+P0063,32,Male,Cardiac Arrest,Hypertension,30,Medium,10,11.6,72,128,95,15,2,63,64,67,68,72,75,79,1
+P0064,79,Male,Respiratory Failure,Heart Disease,30,Medium,10,14.1,75,88,76,7,2,88,90,94,98,99,99,99,0
+P0065,57,Female,Stroke/CNS,COPD,25,Medium,5,14.0,134,178,98,10,3,89,88,89,93,96,96,99,1
+P0066,70,Male,Trauma,Hypertension,20,Assist Control,15,7.9,135,99,90,13,5,76,81,81,81,83,83,85,1
+P0067,41,Male,Cardiac Arrest,COPD,15,Medium,5,3.5,56,140,66,4,1,78,77,79,84,85,88,88,0
+P0068,43,Male,Post-Surgical,Hypertension,25,Medium,5,14.8,63,114,89,6,3,71,77,80,80,81,84,85,0
+P0069,77,Female,Respiratory Failure,Hypertension,25,High,5,12.9,128,129,80,9,3,64,63,65,69,68,71,71,1
+P0070,58,Female,Respiratory Failure,Diabetes,20,Medium,10,3.6,56,161,83,5,4,84,90,91,90,94,94,93,1
+P0071,46,Female,Drug Overdose,Hypertension,30,High,5,14.0,58,141,109,15,2,77,81,87,88,87,90,90,1
+P0072,32,Female,Trauma,,15,Assist Control,0,13.3,97,96,73,14,3,86,91,99,99,99,99,98,1
+P0073,62,Male,Post-Surgical,Heart Disease,20,Assist Control,10,8.7,121,167,94,7,3,71,70,72,77,80,82,81,0
+P0074,82,Male,Respiratory Failure,Heart Disease,15,Low,5,9.7,108,82,84,10,5,71,75,75,77,77,76,77,0
+P0075,26,Female,Stroke/CNS,COPD,20,Assist Control,10,7.2,136,111,97,14,5,68,71,71,77,83,84,88,1
+P0076,18,Male,Stroke/CNS,Hypertension,15,Medium,5,2.7,131,178,55,12,1,63,64,63,67,70,69,71,0
+P0077,25,Male,Post-Surgical,,15,Medium,10,6.4,88,92,68,5,4,56,60,62,64,64,66,66,0
+P0078,80,Male,Cardiac Arrest,COPD,15,Medium,10,12.4,67,168,79,6,1,79,80,88,91,93,94,93,0
+P0079,28,Female,Respiratory Failure,Diabetes,25,Assist Control,0,2.1,108,152,56,11,5,63,62,69,76,75,80,80,1
+P0080,25,Female,Cardiac Arrest,COPD,25,Medium,5,6.3,66,147,59,9,2,76,83,88,93,98,99,99,1
+P0081,52,Male,Respiratory Failure,COPD,25,Medium,0,7.2,63,93,90,3,5,58,62,70,77,79,81,83,0
+P0082,52,Female,Respiratory Failure,Hypertension,30,High,0,9.0,80,177,81,14,4,80,85,90,95,98,99,99,1
+P0083,50,Female,Respiratory Failure,Diabetes,20,Low,20,14.0,73,90,83,6,5,83,82,87,86,88,91,93,0
+P0084,22,Female,Respiratory Failure,COPD,20,Low,5,6.5,109,135,77,6,4,88,90,96,99,99,99,99,1
+P0085,58,Female,Trauma,,30,Low,15,6.5,94,146,109,11,4,77,75,74,76,82,86,88,1
+P0086,45,Female,Post-Surgical,,20,Low,5,11.6,52,171,64,8,4,65,69,77,78,84,86,87,0
+P0087,24,Male,Cardiac Arrest,Heart Disease,30,Low,10,7.9,86,108,79,11,4,60,65,73,78,84,84,88,0
+P0088,29,Female,Cardiac Arrest,Diabetes,15,Low,15,4.9,92,88,86,14,4,72,75,81,82,84,86,85,0
+P0089,51,Male,Stroke/CNS,Diabetes,30,High,10,7.9,89,146,78,8,2,75,77,79,85,88,90,93,1
+P0090,50,Male,Respiratory Failure,Heart Disease,15,Low,10,3.8,139,104,71,8,1,88,91,93,97,99,99,99,1
+P0091,65,Female,Respiratory Failure,COPD,30,Medium,5,4.3,104,177,53,7,3,71,70,72,75,79,80,80,0
+P0092,40,Male,Respiratory Failure,Diabetes,20,Assist Control,5,8.5,136,155,69,7,1,79,77,81,83,85,84,88,0
+P0093,79,Male,Respiratory Failure,,30,Medium,20,7.4,88,121,81,4,4,66,70,75,81,81,84,83,0
+P0094,54,Male,Trauma,,15,High,15,13.9,64,88,85,10,2,77,81,85,91,94,96,98,1
+P0095,61,Female,Cardiac Arrest,Hypertension,25,Low,20,6.7,53,158,99,10,5,76,83,82,81,83,86,85,0
+P0096,52,Female,Trauma,Diabetes,30,Low,0,9.5,135,119,53,13,2,75,82,88,95,99,99,99,1
+P0097,82,Male,Stroke/CNS,COPD,20,Low,10,10.2,74,104,76,15,4,81,80,88,91,95,95,98,1
+P0098,64,Female,Respiratory Failure,Heart Disease,25,Low,20,2.2,62,84,66,3,2,85,84,89,91,97,99,99,1
+P0099,20,Female,Respiratory Failure,Heart Disease,25,Medium,5,10.6,131,90,61,10,2,60,58,62,66,69,69,73,0
+P0100,18,Female,Respiratory Failure,COPD,20,Low,0,4.3,82,138,71,7,4,81,88,92,96,97,99,99,1
+P0101,22,Female,Stroke/CNS,Hypertension,25,Low,10,14.5,65,177,66,4,2,88,93,96,96,99,98,99,1
+P0102,31,Male,Cardiac Arrest,Heart Disease,25,Low,10,3.9,91,167,59,4,3,66,71,75,81,81,80,84,0
+P0103,44,Male,Cardiac Arrest,Diabetes,30,Medium,15,7.4,115,158,103,8,3,61,59,66,71,73,72,76,0
+P0104,26,Female,Stroke/CNS,Hypertension,15,Low,0,3.1,104,117,50,13,2,64,69,77,76,81,80,82,0
+P0105,32,Female,Cardiac Arrest,Diabetes,20,Medium,15,15.0,91,151,71,15,5,71,77,84,87,88,87,88,1
+P0106,59,Male,Cardiac Arrest,,30,Medium,5,8.5,83,84,75,11,4,80,81,89,93,98,97,99,1
+P0107,68,Male,Respiratory Failure,Hypertension,30,High,5,9.7,79,127,105,3,3,75,73,79,81,82,82,86,0
+P0108,80,Female,Cardiac Arrest,Heart Disease,20,Low,5,2.9,62,169,108,14,5,82,80,88,88,91,93,94,1
+P0109,69,Male,Drug Overdose,Hypertension,25,High,15,11.7,62,97,67,8,2,56,56,63,65,66,69,68,0
+P0110,21,Female,Cardiac Arrest,Hypertension,20,High,10,4.7,67,149,99,11,5,55,57,65,64,64,63,67,1
+P0111,40,Female,Stroke/CNS,Hypertension,15,Low,10,13.7,81,116,63,10,1,80,82,88,93,93,93,95,1
+P0112,32,Male,Respiratory Failure,Hypertension,20,Assist Control,5,4.7,88,139,96,13,3,83,89,95,95,94,94,97,1
+P0113,60,Male,Stroke/CNS,Diabetes,20,Assist Control,15,4.5,95,127,78,8,2,75,82,81,81,81,81,84,0
+P0114,46,Female,Respiratory Failure,,25,Low,5,2.5,78,156,61,5,4,65,64,72,79,83,85,85,0
+P0115,53,Female,Cardiac Arrest,COPD,15,Medium,15,8.1,111,107,85,10,2,65,64,67,70,71,74,74,0
+P0116,30,Male,Post-Surgical,Hypertension,30,High,5,9.3,111,148,108,11,4,89,92,94,94,94,96,99,1
+P0117,49,Female,Trauma,Heart Disease,30,High,5,2.9,106,156,84,3,2,88,94,94,99,99,99,99,1
+P0118,76,Male,Drug Overdose,Hypertension,25,Low,10,12.1,65,160,101,14,5,78,76,82,89,94,99,99,1
+P0119,45,Female,Respiratory Failure,Heart Disease,20,Low,5,7.9,105,119,61,11,5,76,82,83,82,88,88,89,1
+P0120,83,Male,Cardiac Arrest,Diabetes,20,Medium,10,8.8,59,124,56,8,5,59,65,67,68,73,74,74,0
+P0121,45,Male,Respiratory Failure,,25,Medium,5,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0122,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0123,45,Male,Respiratory Failure,,25,Medium,5,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0124,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0125,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0126,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0127,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0128,48,Female,Respiratory Failure,,20,Assist Control,15,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0129,48,Female,Respiratory Failure,Hypertension,20,Assist Control,15,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0130,45,Male,Respiratory Failure,Hypertension,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0131,45,Male,Respiratory Failure,Hypertension,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0132,45,Male,Respiratory Failure,Hypertension,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0133,45,Male,Respiratory Failure,Hypertension,25,High,10,8.0,67,127,68,12,3,55,60,80,63,87,81,86,1
+P0134,45,Male,Respiratory Failure,Hypertension,25,High,10,8.0,67,127,68,12,3,55,60,80,63,87,81,86,1
+P0135,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0136,45,Male,Respiratory Failure,Hypertension,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0137,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0138,45,Male,Respiratory Failure,Heart Disease,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0139,45,Male,Respiratory Failure,Heart Disease,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0140,45,Male,Respiratory Failure,Heart Disease,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0141,45,Male,Respiratory Failure,Heart Disease,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0142,45,Male,Respiratory Failure,,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1
+P0143,45,Male,Respiratory Failure,None,25,High,10,8.0,95,120,80,12,3,72,76,80,84,87,90,93,1

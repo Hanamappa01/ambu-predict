@@ -1,0 +1,226 @@
+"""
+AmbuPredict — FastAPI Backend
+NeuO In-Spire Resuscitator Automation System
+ML-powered ventilation outcome prediction API
+"""
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field, validator
+import pandas as pd
+import numpy as np
+import joblib
+import os
+from fastapi.responses import JSONResponse
+
+app = FastAPI(
+    title       = "AmbuPredict API",
+    description = "Predicts ventilation outcome for NeuO In-Spire patients",
+    version     = "1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+)
+
+# Load models from models/ subfolder (one level up from ambu_api/)
+BASE       = os.path.dirname(os.path.abspath(__file__))
+MODELS_DIR = os.path.join(BASE, '..', 'models')
+
+model        = joblib.load(os.path.join(MODELS_DIR, "ambu_rf_model.pkl"))
+scaler       = joblib.load(os.path.join(MODELS_DIR, "ambu_scaler.pkl"))
+encoders     = joblib.load(os.path.join(MODELS_DIR, "ambu_encoders.pkl"))
+feature_cols = joblib.load(os.path.join(MODELS_DIR, "ambu_feature_cols.pkl"))
+
+VALID_GENDERS    = ["Male", "Female"]
+VALID_MODES      = ["Low", "Medium", "High", "Assist Control"]
+VALID_CONDITIONS = ["Cardiac Arrest", "Drug Overdose", "Post-Surgical",
+                    "Respiratory Failure", "Stroke/CNS", "Trauma"]
+VALID_COMORBIDS  = ["None", "Hypertension", "Diabetes", "COPD", "Heart Disease"]
+VALID_BPMS       = [15, 20, 25, 30]
+
+
+class PatientInput(BaseModel):
+    bpm: int          = Field(..., example=25)
+    mode: str         = Field(..., example="High")
+    peep: int         = Field(..., ge=0, le=20, example=10)
+    lpm: float        = Field(..., ge=0, le=20, example=8.0)
+    age: int          = Field(..., ge=1, le=120, example=45)
+    gender: str       = Field(..., example="Male")
+    condition: str    = Field(..., example="Respiratory Failure")
+    comorbidity: str  = Field(..., example="None")
+    pulse: int        = Field(..., ge=20, le=250, example=95)
+    bp_systolic: int  = Field(..., ge=60, le=250, example=120)
+    bp_diastolic: int = Field(..., ge=30, le=150, example=80)
+    gcs_score: int    = Field(..., ge=3, le=15, example=12)
+    cvs_score: int    = Field(..., ge=1, le=5, example=3)
+    spo2_before: int  = Field(..., ge=30, le=100, example=72)
+    spo2_5min: int    = Field(..., ge=30, le=100, example=76)
+    spo2_10min: int   = Field(..., ge=30, le=100, example=80)
+    spo2_15min: int   = Field(..., ge=30, le=100, example=84)
+    spo2_20min: int   = Field(..., ge=30, le=100, example=87)
+    spo2_25min: int   = Field(..., ge=30, le=100, example=90)
+    spo2_30min: int   = Field(..., ge=30, le=100, example=93)
+
+    @validator('bpm')
+    def bpm_valid(cls, v):
+        if v not in VALID_BPMS: raise ValueError(f"BPM must be one of {VALID_BPMS}")
+        return v
+    @validator('mode')
+    def mode_valid(cls, v):
+        if v not in VALID_MODES: raise ValueError(f"Mode must be one of {VALID_MODES}")
+        return v
+    @validator('gender')
+    def gender_valid(cls, v):
+        if v not in VALID_GENDERS: raise ValueError(f"Gender must be one of {VALID_GENDERS}")
+        return v
+    @validator('condition')
+    def condition_valid(cls, v):
+        if v not in VALID_CONDITIONS: raise ValueError(f"Condition must be one of {VALID_CONDITIONS}")
+        return v
+    @validator('comorbidity')
+    def comorbidity_valid(cls, v):
+        if v not in VALID_COMORBIDS: raise ValueError(f"Comorbidity must be one of {VALID_COMORBIDS}")
+        return v
+
+
+class PatientAddInput(PatientInput):
+    outcome: int = Field(..., description="Actual outcome: 1 for Positive, 0 for Negative")
+
+
+class PredictionResponse(BaseModel):
+    probability: float
+    probability_pct: float
+    outcome: str
+    risk_level: str
+    clinical_advice: str
+    top_factors: list
+
+
+def build_features(p: PatientInput) -> pd.DataFrame:
+    ge = encoders['gender'].transform([p.gender])[0]
+    ce = encoders['condition'].transform([p.condition])[0]
+    co = encoders['comorbidity'].transform([p.comorbidity])[0]
+    me = encoders['mode'].transform([p.mode])[0]
+    delta = p.spo2_30min - p.spo2_before
+    raw = pd.DataFrame([[
+        p.bpm, me, p.peep, p.lpm, p.age, ge, ce, co,
+        p.pulse, p.bp_systolic, p.bp_diastolic, p.gcs_score, p.cvs_score,
+        p.spo2_before, p.spo2_5min, p.spo2_10min, p.spo2_15min,
+        p.spo2_20min, p.spo2_25min, p.spo2_30min,
+        delta, delta/30, p.spo2_15min,
+        int(p.age > 70), int(p.gcs_score < 8), p.bp_systolic/(p.pulse+1)
+    ]], columns=feature_cols)
+    return pd.DataFrame(scaler.transform(raw), columns=feature_cols)
+
+
+@app.get("/", tags=["Health"])
+def root():
+    return {"status": "ok", "service": "AmbuPredict API v1.0"}
+
+
+@app.get("/meta", tags=["Meta"])
+def get_valid_values():
+    return {
+        "bpm_options": VALID_BPMS, "mode_options": VALID_MODES,
+        "gender_options": VALID_GENDERS, "condition_options": VALID_CONDITIONS,
+        "comorbidity_options": VALID_COMORBIDS, "peep_options": [0,5,10,15,20],
+    }
+
+
+@app.post("/predict", response_model=PredictionResponse, tags=["Prediction"])
+def predict(patient: PatientInput):
+    """Predict ventilation outcome for a single patient."""
+    try:
+        features = build_features(patient)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Feature encoding error: {str(e)}")
+    try:
+        prob  = float(model.predict_proba(features)[0][1])
+        label = "Positive" if prob >= 0.5 else "Negative"
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Model inference error: {str(e)}")
+
+    if prob >= 0.70:
+        risk   = "HIGH"
+        advice = "High probability of effective ventilation. Proceed with current settings. Monitor SpO₂ every 5 min."
+    elif prob >= 0.45:
+        risk   = "MODERATE"
+        advice = "Moderate probability. Monitor closely. If SpO₂ not improving by 15 min, adjust BPM or Mode upward."
+    else:
+        risk   = "LOW"
+        advice = "Low probability of success. Consider increasing BPM/Mode, adjusting PEEP, or escalating to full ventilator."
+
+    top_idx = np.argsort(model.feature_importances_)[::-1][:5]
+    top_factors = [{"feature": feature_cols[i], "importance": round(float(model.feature_importances_[i]), 4)} for i in top_idx]
+
+    return PredictionResponse(
+        probability=round(prob,4), probability_pct=round(prob*100,1),
+        outcome=label, risk_level=risk, clinical_advice=advice, top_factors=top_factors,
+    )
+
+
+@app.post("/batch-predict", tags=["Prediction"])
+def batch_predict(patients: list[PatientInput]):
+    """Predict outcomes for up to 50 patients at once."""
+    if len(patients) > 50:
+        raise HTTPException(status_code=400, detail="Max 50 patients per batch.")
+    results = []
+    for i, p in enumerate(patients):
+        try:
+            prob = float(model.predict_proba(build_features(p))[0][1])
+            results.append({"index": i+1, "probability_pct": round(prob*100,1),
+                "outcome": "Positive" if prob>=0.5 else "Negative",
+                "risk_level": "HIGH" if prob>=0.70 else ("MODERATE" if prob>=0.45 else "LOW")})
+        except Exception as e:
+            results.append({"index": i+1, "error": str(e)})
+    return {"total": len(patients), "results": results}
+
+
+@app.post("/add_patient", tags=["Data"])
+def add_patient(patient: PatientAddInput):
+    """Add a new patient and trigger model retraining."""
+    data_path = os.path.join(BASE, '..', 'data', 'ambu_patient_data.csv')
+    try:
+        df = pd.read_csv(data_path)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Dataset not found.")
+    
+    new_id = f"P{str(len(df)+1).zfill(4)}"
+    
+    new_row = {
+        'patient_id': new_id,
+        'age': patient.age, 'gender': patient.gender,
+        'condition': patient.condition, 'comorbidity': patient.comorbidity,
+        'bpm': patient.bpm, 'mode': patient.mode,
+        'peep': patient.peep, 'lpm': patient.lpm,
+        'pulse': patient.pulse, 'bp_systolic': patient.bp_systolic,
+        'bp_diastolic': patient.bp_diastolic,
+        'gcs_score': patient.gcs_score, 'cvs_score': patient.cvs_score,
+        'spo2_before': patient.spo2_before,
+        'spo2_5min': patient.spo2_5min, 'spo2_10min': patient.spo2_10min,
+        'spo2_15min': patient.spo2_15min, 'spo2_20min': patient.spo2_20min,
+        'spo2_25min': patient.spo2_25min, 'spo2_30min': patient.spo2_30min,
+        'outcome': patient.outcome
+    }
+    
+    # Append and save
+    df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+    df.to_csv(data_path, index=False)
+    
+    # Trigger retraining
+    try:
+        from .retrain import run_retraining  # ✅ FIXED: relative import
+        run_retraining()
+        
+        # Reload models into memory globally
+        global model, scaler, encoders, feature_cols
+        model        = joblib.load(os.path.join(MODELS_DIR, "ambu_rf_model.pkl"))
+        scaler       = joblib.load(os.path.join(MODELS_DIR, "ambu_scaler.pkl"))
+        encoders     = joblib.load(os.path.join(MODELS_DIR, "ambu_encoders.pkl"))
+        feature_cols = joblib.load(os.path.join(MODELS_DIR, "ambu_feature_cols.pkl"))
+        
+        return {"status": "success", "message": "Patient added and model retrained successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Retraining failed: {str(e)}")
