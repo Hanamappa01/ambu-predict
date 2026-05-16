@@ -1916,6 +1916,47 @@
         runPrediction();
     });
   </script>
+    <div id="summary-section" style="display:none;">
+      <div class="home-hero" style="margin-bottom:30px;">
+        <h1 style="font-size:36px;">&#128202; Data Summary</h1>
+        <p style="color:var(--muted);">Overview of all patient data used to train the model</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:30px;">
+        <div class="home-card" style="text-align:center;padding:20px;">
+          <div style="font-size:40px;font-weight:800;color:var(--accent);" id="stat-mongo">-</div>
+          <div style="color:var(--muted);margin-top:6px;">Patients in DB</div>
+        </div>
+        <div class="home-card" style="text-align:center;padding:20px;">
+          <div style="font-size:40px;font-weight:800;color:#4ade80;" id="stat-positive">-</div>
+          <div style="color:var(--muted);margin-top:6px;">Positive Outcomes</div>
+        </div>
+        <div class="home-card" style="text-align:center;padding:20px;">
+          <div style="font-size:40px;font-weight:800;color:var(--danger);" id="stat-negative">-</div>
+          <div style="color:var(--muted);margin-top:6px;">Negative Outcomes</div>
+        </div>
+        <div class="home-card" style="text-align:center;padding:20px;">
+          <div style="font-size:40px;font-weight:800;color:var(--warn);" id="stat-avg-age">-</div>
+          <div style="color:var(--muted);margin-top:6px;">Avg. Age</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:30px;flex-wrap:wrap;">
+        <button class="btn-predict" onclick="downloadAllData()" style="flex:1;min-width:200px;">&#11015; Download All Patient Data (CSV)</button>
+        <button class="btn-predict" onclick="loadSummary()" style="flex:1;min-width:200px;background:linear-gradient(135deg,#334155,#475569);">&#128260; Refresh</button>
+      </div>
+      <div class="home-card" style="margin-bottom:20px;">
+        <h3>Condition Breakdown</h3>
+        <div id="condition-breakdown" style="margin-top:10px;">Click Refresh to load...</div>
+      </div>
+      <div class="home-card" style="margin-bottom:20px;">
+        <h3>Gender Breakdown</h3>
+        <div id="gender-breakdown" style="margin-top:10px;">Click Refresh to load...</div>
+      </div>
+      <div class="home-card">
+        <h3>Recently Added Patients</h3>
+        <div id="recent-patients" style="margin-top:10px;overflow-x:auto;">Click Refresh to load...</div>
+      </div>
+    </div>
 </body>
 
 </html>
+
