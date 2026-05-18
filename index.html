@@ -1245,6 +1245,20 @@
         </select>
       </div>
 
+      <!-- Photo Upload (Add Patient only) -->
+      <div id="photo-upload-card" class="card" style="display:none; margin-bottom:20px; border-color:rgba(79,172,254,0.3);">
+        <div class="card-title">📷 Patient Photos (Optional, max 5)</div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:14px;color:var(--muted);margin-bottom:8px;">Upload up to 5 photos (X-ray, monitor, injury, etc.)</label>
+          <input type="file" id="photo-input" accept="image/*" multiple style="
+            width:100%; background:var(--surface2); border:1px dashed var(--border2);
+            color:var(--text); border-radius:10px; padding:12px; font-size:14px; cursor:pointer;
+          " onchange="previewPhotos(this)" />
+        </div>
+        <div id="photo-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;"></div>
+        <div id="photo-upload-status" style="margin-top:8px;font-size:13px;color:var(--muted);"></div>
+      </div>
+
       <div class="action-row">
         <button class="btn-predict" id="predict-btn" onclick="runPrediction()" style="flex:1;">
           Run Prediction
@@ -1384,6 +1398,7 @@
       document.getElementById('add-btn').style.display = 'none';
       document.getElementById('result-panel').style.display = 'none';
       document.getElementById('add-patient-banner').style.display = 'none';
+      document.getElementById('photo-upload-card').style.display = 'none';
 
       if (tab === 'home') {
         document.getElementById('nav-home').classList.add('active');
@@ -1406,6 +1421,7 @@
         document.getElementById('spo2-chart-card').style.display = 'block';
         document.getElementById('spo2-chart-label').style.display = 'flex';
         document.getElementById('spo2-section-label').textContent = 'SpO₂ Readings Post-Intubation';
+        document.getElementById('photo-upload-card').style.display = 'block';
       } else if (tab === 'summary') {
         document.getElementById('nav-summary').classList.add('active');
         document.getElementById('summary-section').style.display = 'block';
@@ -1621,24 +1637,36 @@
       const errBox = document.getElementById('error-box');
       errBox.style.display = 'none';
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Retraining...';
+      btn.innerHTML = '<span class="spinner"></span>Uploading...';
 
+      // Upload photos first
+      let photoUrls = [];
+      if (selectedPhotos.length > 0) {
+        photoUrls = await uploadPhotosToCloudinary();
+      }
+
+      btn.innerHTML = '<span class="spinner"></span>Retraining...';
       const formData = getFormData();
       formData.outcome = parseInt(document.getElementById('actual-outcome').value);
+      formData.photo_urls = photoUrls;
 
       try {
         const resp = await fetch(`${API}/add_patient`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
-          signal: AbortSignal.timeout(15000)
+          signal: AbortSignal.timeout(30000)
         });
         if (!resp.ok) {
           const err = await resp.json();
           throw new Error(err.detail || `HTTP ${resp.status}`);
         }
         const data = await resp.json();
-        alert('✅ ' + data.message);
+        alert('✅ ' + data.message + (photoUrls.length ? ` (${photoUrls.length} photo(s) saved)` : ''));
+        selectedPhotos = [];
+        document.getElementById('photo-preview').innerHTML = '';
+        document.getElementById('photo-upload-status').textContent = '';
+        document.getElementById('photo-input').value = '';
         switchTab('predictor');
       } catch (e) {
         errBox.style.display = 'block';
@@ -1847,6 +1875,55 @@
       document.getElementById('spo2_25').value = '85';
       document.getElementById('spo2_30').value = '88';
       updateChart();
+    }
+
+    // ── Photo Upload (Cloudinary) ─────────────────────────────────────────────
+    const CLOUDINARY_CLOUD = 'dbcskd71r';
+    const CLOUDINARY_PRESET = 'ohkmri2d';
+    let selectedPhotos = [];
+
+    function previewPhotos(input) {
+      const files = Array.from(input.files).slice(0, 5);
+      selectedPhotos = files;
+      const preview = document.getElementById('photo-preview');
+      preview.innerHTML = '';
+      files.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const div = document.createElement('div');
+          div.style.cssText = 'position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);';
+          div.innerHTML = `
+            <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" />
+            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-size:10px;color:#fff;text-align:center;padding:2px;">${i+1}</div>`;
+          preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+      document.getElementById('photo-upload-status').textContent = `${files.length} photo(s) selected`;
+    }
+
+    async function uploadPhotosToCloudinary() {
+      if (!selectedPhotos.length) return [];
+      const status = document.getElementById('photo-upload-status');
+      const urls = [];
+      for (let i = 0; i < selectedPhotos.length; i++) {
+        status.textContent = `Uploading photo ${i+1} of ${selectedPhotos.length}...`;
+        const formData = new FormData();
+        formData.append('file', selectedPhotos[i]);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        formData.append('folder', 'ambupredict_patients');
+        try {
+          const resp = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+            method: 'POST', body: formData
+          });
+          const data = await resp.json();
+          if (data.secure_url) urls.push(data.secure_url);
+        } catch (e) {
+          console.error('Photo upload failed:', e);
+        }
+      }
+      status.textContent = `✅ ${urls.length} photo(s) uploaded successfully!`;
+      return urls;
     }
 
     // ── Data Summary Functions ────────────────────────────────────────────────

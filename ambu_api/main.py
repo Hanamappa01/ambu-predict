@@ -115,6 +115,7 @@ class PatientInput(BaseModel):
 
 class PatientAddInput(PatientInput):
     outcome: int = Field(..., description="Actual outcome: 1 for Positive, 0 for Negative")
+    photo_urls: list = Field(default=[], description="Cloudinary photo URLs")
 
 
 class PredictionResponse(BaseModel):
@@ -228,6 +229,7 @@ def add_patient(patient: PatientAddInput):
         'spo2_15min': patient.spo2_15min, 'spo2_20min': patient.spo2_20min,
         'spo2_25min': patient.spo2_25min, 'spo2_30min': patient.spo2_30min,
         'outcome': patient.outcome,
+        'photo_urls': patient.photo_urls,
         'added_at': datetime.utcnow().isoformat()
     }
 
