@@ -40,6 +40,8 @@ def _process_and_train(df: pd.DataFrame):
         df_proc.drop(columns=['_id'], inplace=True)
     if 'added_at' in df_proc.columns:
         df_proc.drop(columns=['added_at'], inplace=True)
+    if 'photo_urls' in df_proc.columns:
+        df_proc.drop(columns=['photo_urls'], inplace=True)
 
     # Encode categorical columns
     le_gender    = LabelEncoder()
