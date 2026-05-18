@@ -1250,10 +1250,11 @@
         <div class="card-title">📷 Patient Photos (Optional, max 5)</div>
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:14px;color:var(--muted);margin-bottom:8px;">Upload up to 5 photos (X-ray, monitor, injury, etc.)</label>
-          <input type="file" id="photo-input" accept="image/*" multiple style="
+          <input type="file" id="photo-input" accept="image/*" multiple max="5" style="
             width:100%; background:var(--surface2); border:1px dashed var(--border2);
             color:var(--text); border-radius:10px; padding:12px; font-size:14px; cursor:pointer;
           " onchange="previewPhotos(this)" />
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">💡 Hold Ctrl (Windows) or Cmd (Mac) to select multiple photos at once</div>
         </div>
         <div id="photo-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;"></div>
         <div id="photo-upload-status" style="margin-top:8px;font-size:13px;color:var(--muted);"></div>
@@ -1883,23 +1884,26 @@
     let selectedPhotos = [];
 
     function previewPhotos(input) {
-      const files = Array.from(input.files).slice(0, 5);
-      selectedPhotos = files;
+      const files = Array.from(input.files);
+      if (files.length > 5) {
+        alert('Maximum 5 photos allowed! Only first 5 will be used.');
+      }
+      selectedPhotos = files.slice(0, 5);
       const preview = document.getElementById('photo-preview');
       preview.innerHTML = '';
-      files.forEach((file, i) => {
+      selectedPhotos.forEach((file, i) => {
         const reader = new FileReader();
         reader.onload = e => {
           const div = document.createElement('div');
-          div.style.cssText = 'position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);';
+          div.style.cssText = 'position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);flex-shrink:0;';
           div.innerHTML = `
             <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" />
-            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-size:10px;color:#fff;text-align:center;padding:2px;">${i+1}</div>`;
+            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-size:10px;color:#fff;text-align:center;padding:2px;">Photo ${i+1}</div>`;
           preview.appendChild(div);
         };
         reader.readAsDataURL(file);
       });
-      document.getElementById('photo-upload-status').textContent = `${files.length} photo(s) selected`;
+      document.getElementById('photo-upload-status').textContent = `${selectedPhotos.length} photo(s) selected — ready to upload`;
     }
 
     async function uploadPhotosToCloudinary() {
