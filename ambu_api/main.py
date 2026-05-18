@@ -273,7 +273,13 @@ def add_patient(patient: PatientAddInput):
         else:
             df_all = df_csv
 
-        # Retrain model
+        # Retrain model - keep ONLY required columns
+        REQUIRED = ['age','gender','condition','comorbidity','bpm','mode','peep','lpm',
+                    'pulse','bp_systolic','bp_diastolic','gcs_score','cvs_score',
+                    'spo2_before','spo2_5min','spo2_10min','spo2_15min',
+                    'spo2_20min','spo2_25min','spo2_30min','outcome']
+        df_all = df_all[[c for c in REQUIRED if c in df_all.columns]]
+
         from .retrain import run_retraining_with_data
         run_retraining_with_data(df_all)
 
