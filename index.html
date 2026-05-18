@@ -1311,7 +1311,8 @@
         </div>
       </div>
 
-      <!-- Prediction History -->
+      <!-- Prediction History (Predictor tab only) -->
+      <div id="history-wrapper">
       <div class="history-section">
         <div class="section-label" style="margin-top:0;">
           Prediction History
@@ -1321,6 +1322,17 @@
         </div>
         <div id="history-list">
           <div class="history-empty" id="history-empty">No predictions yet this session.</div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Add Patient Guidance (Add Patient tab only) -->
+      <div id="add-guidance" style="display:none; margin-top:24px;">
+        <div class="advice-box" style="display:flex; flex-direction:column; gap:8px;">
+          <strong style="font-size:16px;">💡 How to use</strong>
+          <span>1. Fill in the patient vitals and machine settings used during ventilation.</span>
+          <span>2. Upload photos if available (X-ray, monitor, etc.) — optional.</span>
+          <span>3. Click <b style="color:var(--warn);">Add & Retrain</b> to save the patient and improve the AI model.</span>
         </div>
       </div>
 
@@ -1403,6 +1415,8 @@
       document.getElementById('result-panel').style.display = 'none';
       document.getElementById('add-patient-banner').style.display = 'none';
       document.getElementById('photo-upload-card').style.display = 'none';
+      document.getElementById('add-guidance').style.display = 'none';
+      document.getElementById('history-wrapper').style.display = 'block';
 
       if (tab === 'home') {
         document.getElementById('nav-home').classList.add('active');
@@ -1426,6 +1440,8 @@
         document.getElementById('spo2-chart-label').style.display = 'flex';
         document.getElementById('spo2-section-label').textContent = 'SpO₂ Readings Post-Intubation';
         document.getElementById('photo-upload-card').style.display = 'block';
+        document.getElementById('history-wrapper').style.display = 'none';
+        document.getElementById('add-guidance').style.display = 'block';
       } else if (tab === 'summary') {
         document.getElementById('nav-summary').classList.add('active');
         document.getElementById('summary-section').style.display = 'block';
