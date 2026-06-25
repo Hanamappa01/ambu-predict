@@ -1447,10 +1447,8 @@
       document.getElementById('nav-home').classList.remove('active');
       document.getElementById('nav-predictor').classList.remove('active');
       document.getElementById('nav-add').classList.remove('active');
-      document.getElementById('nav-summary').classList.remove('active');
       document.getElementById('home-section').style.display = 'none';
       document.getElementById('predictor-section').style.display = 'none';
-      document.getElementById('summary-section').style.display = 'none';
       document.getElementById('outcome-card').style.display = 'none';
       document.getElementById('predict-btn').style.display = 'none';
       document.getElementById('add-btn').style.display = 'none';
@@ -1484,10 +1482,6 @@
         document.getElementById('photo-upload-card').style.display = 'block';
         document.getElementById('history-wrapper').style.display = 'none';
         document.getElementById('add-guidance').style.display = 'block';
-      } else if (tab === 'summary') {
-        document.getElementById('nav-summary').classList.add('active');
-        document.getElementById('summary-section').style.display = 'block';
-        loadSummary();
       }
     }
 
