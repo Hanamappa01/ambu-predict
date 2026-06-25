@@ -284,8 +284,7 @@ function doLogout() {
   localStorage.removeItem('admin_token');
   localStorage.removeItem('admin_user');
   token = null;
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('login-wrap').style.display = 'flex';
+  window.location.href = 'index.html';
 }
 
 function showDashboard(username) {
@@ -454,11 +453,10 @@ function showToast(msg, type='success') {
   setTimeout(() => t.className = 'toast', 3000);
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────
-if (token) {
-  const savedUser = localStorage.getItem('admin_user') || 'Admin';
-  showDashboard(savedUser);
-}
+// ── Init — always show login, never auto-login ────────────────────────────
+localStorage.removeItem('admin_token');
+localStorage.removeItem('admin_user');
+token = null;
 </script>
 </body>
 </html>
