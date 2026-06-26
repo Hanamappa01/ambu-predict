@@ -941,10 +941,60 @@
       border-color: var(--danger);
       color: var(--danger);
     }
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed; top: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+    }
+    .toast-item {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(15, 23, 35, 0.95);
+      border: 1px solid var(--border2);
+      border-radius: 12px; padding: 14px 18px;
+      min-width: 280px; max-width: 380px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      pointer-events: all;
+      animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .toast-item.hiding { animation: toastOut 0.3s ease forwards; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(120px) scale(0.8); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0) scale(1); }
+      to { opacity: 0; transform: translateX(120px) scale(0.8); }
+    }
+    .toast-icon { font-size: 22px; flex-shrink: 0; }
+    .toast-content { flex: 1; }
+    .toast-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+    .toast-msg { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .toast-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 0; flex-shrink: 0; }
+    .toast-close:hover { color: var(--text); }
+    .toast-item.success { border-color: rgba(74,222,128,0.4); }
+    .toast-item.success .toast-title { color: #4ade80; }
+    .toast-item.error { border-color: rgba(248,113,113,0.4); }
+    .toast-item.error .toast-title { color: var(--danger); }
+    .toast-item.info { border-color: rgba(0,242,254,0.4); }
+    .toast-item.info .toast-title { color: var(--accent); }
+    .toast-item.warn { border-color: rgba(251,191,36,0.4); }
+    .toast-item.warn .toast-title { color: var(--warn); }
+    .toast-progress {
+      position: absolute; bottom: 0; left: 0; height: 3px; border-radius: 0 0 12px 12px;
+      animation: toastProgress linear forwards;
+    }
+    .toast-item { position: relative; overflow: hidden; }
+    .toast-item.success .toast-progress { background: #4ade80; }
+    .toast-item.error .toast-progress { background: var(--danger); }
+    .toast-item.info .toast-progress { background: var(--accent); }
+    .toast-item.warn .toast-progress { background: var(--warn); }
+    @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
   </style>
 </head>
 
 <body>
+  <div class="toast-container" id="toast-container"></div>
   <div class="wrapper">
 
     <!-- Header -->
@@ -1703,7 +1753,7 @@
 
     function exportHistory() {
       if (predHistory.length === 0) {
-        alert('No predictions to export!');
+        showToast('No Data', 'No predictions to export yet!', 'warn');
         return;
       }
       const headers = ['Time', 'Age', 'Gender', 'Condition', 'BPM', 'Mode', 'SpO2_Before', 'SpO2_30min', 'Probability', 'Risk_Level', 'Outcome'];
@@ -1761,7 +1811,8 @@
           throw new Error(err.detail || `HTTP ${resp.status}`);
         }
         const data = await resp.json();
-        alert('✅ ' + data.message + (photoUrls.length ? ` (${photoUrls.length} photo(s) saved)` : ''));
+        const photoMsg = photoUrls.length ? `${photoUrls.length} photo(s) saved to cloud` : '';
+        showToast('Patient Added Successfully! 🎉', data.message + (photoMsg ? ` • ${photoMsg}` : ''), 'success', 5000);
         selectedPhotos = [];
         document.getElementById('photo-preview').innerHTML = '';
         document.getElementById('photo-upload-status').textContent = '';
@@ -1985,7 +2036,7 @@
     function previewPhotos(input) {
       const files = Array.from(input.files);
       if (files.length > 5) {
-        alert('Maximum 5 photos allowed! Only first 5 will be used.');
+        showToast('Photo Limit', 'Maximum 5 photos allowed. Only first 5 will be used.', 'warn');
       }
       selectedPhotos = files.slice(0, 5);
       const preview = document.getElementById('photo-preview');
@@ -2097,7 +2148,7 @@
         const resp = await fetch(`${API}/patients/all`, { signal: AbortSignal.timeout(8000) });
         if (!resp.ok) throw new Error('API not reachable');
         const json = await resp.json();
-        if (!json.patients || !json.patients.length) { alert('No patient data in MongoDB yet!'); return; }
+        if (!json.patients || !json.patients.length) { showToast('No Data', 'No patient data in MongoDB yet!', 'warn'); return; }
         const headers = ['age','gender','condition','comorbidity','bpm','mode','peep','lpm',
           'pulse','bp_systolic','bp_diastolic','gcs_score','cvs_score',
           'spo2_before','spo2_5min','spo2_10min','spo2_15min','spo2_20min','spo2_25min','spo2_30min','outcome','added_at'];
@@ -2110,7 +2161,29 @@
         a.download = `AmbuPredict_PatientData_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
-      } catch (e) { alert('Download failed: ' + e.message); }
+      } catch (e) { showToast('Download Failed', e.message, 'error'); }
+    }
+
+    // ── Toast Notifications ───────────────────────────────────────────────────
+    function showToast(title, msg = '', type = 'success', duration = 4000) {
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warn: '⚠️' };
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast-item ${type}`;
+      toast.innerHTML = `
+        <div class="toast-icon">${icons[type]}</div>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          ${msg ? `<div class="toast-msg">${msg}</div>` : ''}
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+        <div class="toast-progress" style="animation-duration:${duration}ms;"></div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
     }
 
     // Enter key shortcut
