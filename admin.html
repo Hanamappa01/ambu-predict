@@ -210,6 +210,84 @@
     </div>
   </div>
 
+  <!-- Model Accuracy Section -->
+  <div class="section-card" style="margin-bottom:24px;">
+    <h3>🎯 Live Model Accuracy</h3>
+    <div id="accuracy-loading" style="color:var(--muted);font-size:14px;font-family:'DM Mono',monospace;">
+      Click "Calculate Accuracy" to run live evaluation...
+    </div>
+    <div id="accuracy-content" style="display:none;">
+      <!-- Metric Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px;">
+        <div style="background:var(--surface2);border:1px solid rgba(0,242,254,0.3);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:32px;font-weight:800;color:var(--accent);" id="acc-accuracy">—</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:4px;">Accuracy</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(74,222,128,0.3);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:32px;font-weight:800;color:#4ade80;" id="acc-recall">—</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:4px;">Recall</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(79,172,254,0.3);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:32px;font-weight:800;color:var(--accent2);" id="acc-precision">—</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:4px;">Precision</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:32px;font-weight:800;color:var(--warn);" id="acc-f1">—</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:4px;">F1 Score</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:32px;font-weight:800;color:var(--text);" id="acc-total">—</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:4px;">Total Patients</div>
+        </div>
+      </div>
+
+      <!-- Progress Bars -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span style="color:var(--muted);">Accuracy</span><span id="bar-acc-label" style="color:var(--accent);font-weight:600;"></span>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:10px;overflow:hidden;">
+            <div id="bar-acc" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;width:0%;transition:width 1s ease;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span style="color:var(--muted);">Recall</span><span id="bar-rec-label" style="color:#4ade80;font-weight:600;"></span>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:10px;overflow:hidden;">
+            <div id="bar-rec" style="height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:4px;width:0%;transition:width 1s ease;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span style="color:var(--muted);">Precision</span><span id="bar-pre-label" style="color:var(--accent2);font-weight:600;"></span>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:10px;overflow:hidden;">
+            <div id="bar-pre" style="height:100%;background:linear-gradient(90deg,var(--accent2),#60a5fa);border-radius:4px;width:0%;transition:width 1s ease;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span style="color:var(--muted);">F1 Score</span><span id="bar-f1-label" style="color:var(--warn);font-weight:600;"></span>
+          </div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:10px;overflow:hidden;">
+            <div id="bar-f1" style="height:100%;background:linear-gradient(90deg,var(--warn),#f97316);border-radius:4px;width:0%;transition:width 1s ease;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info note -->
+      <div style="background:rgba(0,242,254,0.05);border:1px solid rgba(0,242,254,0.15);border-radius:8px;padding:12px;font-size:13px;color:var(--muted);">
+        💡 <strong style="color:var(--accent);">5-Fold Cross Validation</strong> — Accuracy improves as more real patient data is added. Current model trained on <span id="acc-total-note">—</span> patients.
+      </div>
+    </div>
+
+    <button class="btn-action primary" onclick="loadAccuracy()" id="acc-btn" style="margin-top:16px;">
+      🎯 Calculate Live Accuracy
+    </button>
+  </div>
+
   <!-- Add Admin User -->
   <div class="section-card">
     <h3>➕ Add Admin User</h3>
@@ -403,6 +481,55 @@ function downloadCSV() {
   a.href = url; a.download = `AmbuPredict_Admin_${new Date().toISOString().split('T')[0]}.csv`;
   a.click(); URL.revokeObjectURL(url);
   showToast('CSV downloaded!', 'success');
+}
+
+// ── Model Accuracy ────────────────────────────────────────────────────────
+async function loadAccuracy() {
+  const btn = document.getElementById('acc-btn');
+  const loading = document.getElementById('accuracy-loading');
+  const content = document.getElementById('accuracy-content');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;"></span>Calculating...';
+  loading.style.display = 'block';
+  loading.textContent = '⏳ Running 5-fold cross validation... this may take 30-60 seconds...';
+  content.style.display = 'none';
+
+  try {
+    const resp = await fetch(`${API}/admin/accuracy`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      signal: AbortSignal.timeout(120000)
+    });
+    if (!resp.ok) throw new Error((await resp.json()).detail);
+    const d = await resp.json();
+
+    document.getElementById('acc-accuracy').textContent = d.accuracy + '%';
+    document.getElementById('acc-recall').textContent = d.recall + '%';
+    document.getElementById('acc-precision').textContent = d.precision + '%';
+    document.getElementById('acc-f1').textContent = d.f1_score + '%';
+    document.getElementById('acc-total').textContent = d.total_patients;
+    document.getElementById('acc-total-note').textContent = d.total_patients;
+
+    setTimeout(() => {
+      document.getElementById('bar-acc').style.width = d.accuracy + '%';
+      document.getElementById('bar-rec').style.width = d.recall + '%';
+      document.getElementById('bar-pre').style.width = d.precision + '%';
+      document.getElementById('bar-f1').style.width = d.f1_score + '%';
+      document.getElementById('bar-acc-label').textContent = d.accuracy + '%';
+      document.getElementById('bar-rec-label').textContent = d.recall + '%';
+      document.getElementById('bar-pre-label').textContent = d.precision + '%';
+      document.getElementById('bar-f1-label').textContent = d.f1_score + '%';
+    }, 100);
+
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    showToast('✅ Accuracy calculated!', `Model accuracy: ${d.accuracy}%`, 'success');
+  } catch(e) {
+    loading.textContent = '❌ Failed: ' + e.message;
+    showToast('Calculation failed', e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🎯 Recalculate Accuracy';
+  }
 }
 
 // ── Add Admin User ────────────────────────────────────────────────────────

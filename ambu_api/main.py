@@ -453,3 +453,103 @@ def admin_add_user(data: AddUserInput):
         "role": data.role
     })
     return {"status": "success", "message": f"User '{data.username}' added successfully"}
+
+
+# ── Model Accuracy Endpoint ───────────────────────────────────────────────────
+@app.get("/admin/accuracy", tags=["Admin"])
+def get_model_accuracy():
+    """Calculate live model accuracy using current training data."""
+    try:
+        import pandas as pd
+        import numpy as np
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+        from sklearn.model_selection import StratifiedKFold, cross_val_score
+        from imblearn.over_sampling import SMOTE
+        import warnings
+        warnings.filterwarnings('ignore')
+
+        REQUIRED = ['age','gender','condition','comorbidity','bpm','mode','peep','lpm',
+                    'pulse','bp_systolic','bp_diastolic','gcs_score','cvs_score',
+                    'spo2_before','spo2_5min','spo2_10min','spo2_15min',
+                    'spo2_20min','spo2_25min','spo2_30min','outcome']
+
+        # Load CSV
+        data_path = os.path.join(BASE, '..', 'data', 'ambu_patient_data.csv')
+        df_csv = pd.read_csv(data_path)
+        df_csv = df_csv[[c for c in REQUIRED if c in df_csv.columns]]
+
+        # Load MongoDB
+        if patients_col is not None:
+            mongo_records = list(patients_col.find({}, {'_id': 0, 'added_at': 0, 'photo_urls': 0}))
+            if mongo_records:
+                df_mongo = pd.DataFrame(mongo_records)
+                df_mongo = df_mongo[[c for c in REQUIRED if c in df_mongo.columns]]
+                df_all = pd.concat([df_csv, df_mongo], ignore_index=True)
+            else:
+                df_all = df_csv
+        else:
+            df_all = df_csv
+
+        df_all = df_all[[c for c in REQUIRED if c in df_all.columns]].dropna()
+        total_patients = len(df_all)
+
+        if total_patients < 10:
+            raise HTTPException(status_code=400, detail="Not enough data to calculate accuracy")
+
+        # Encode
+        le_g = LabelEncoder(); le_g.fit(["Male","Female"])
+        le_c = LabelEncoder()
+        all_conditions = list(set(["Cardiac Arrest","Drug Overdose","Post-Surgical",
+                    "Respiratory Failure","Stroke/CNS","Trauma"] + list(df_all['condition'].unique())))
+        le_c.fit(all_conditions)
+        le_co = LabelEncoder(); le_co.fit(["None","Hypertension","Diabetes","COPD","Heart Disease"])
+        le_m = LabelEncoder(); le_m.fit(["Low","Medium","High","Assist Control"])
+
+        df_all['gender'] = df_all['gender'].apply(lambda x: le_g.transform([x])[0] if x in ["Male","Female"] else 0)
+        df_all['condition'] = df_all['condition'].apply(lambda x: le_c.transform([x])[0] if x in all_conditions else 0)
+        df_all['comorbidity'] = df_all['comorbidity'].apply(lambda x: le_co.transform([x])[0] if x in ["None","Hypertension","Diabetes","COPD","Heart Disease"] else 0)
+        df_all['mode'] = df_all['mode'].apply(lambda x: le_m.transform([x])[0] if x in ["Low","Medium","High","Assist Control"] else 0)
+
+        df_all['spo2_delta'] = df_all['spo2_30min'] - df_all['spo2_before']
+        df_all['spo2_slope'] = df_all['spo2_delta'] / 30
+        df_all['spo2_at_15'] = df_all['spo2_15min']
+        df_all['age_flag'] = (df_all['age'] > 70).astype(int)
+        df_all['gcs_flag'] = (df_all['gcs_score'] < 8).astype(int)
+        df_all['bp_pulse_ratio'] = df_all['bp_systolic'] / (df_all['pulse'] + 1)
+
+        FEATURES = ['bpm','mode','peep','lpm','age','gender','condition','comorbidity',
+            'pulse','bp_systolic','bp_diastolic','gcs_score','cvs_score',
+            'spo2_before','spo2_5min','spo2_10min','spo2_15min','spo2_20min','spo2_25min','spo2_30min',
+            'spo2_delta','spo2_slope','spo2_at_15','age_flag','gcs_flag','bp_pulse_ratio']
+
+        X = df_all[FEATURES]
+        y = df_all['outcome']
+
+        scaler = MinMaxScaler()
+        X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=FEATURES)
+
+        smote = SMOTE(random_state=42)
+        X_res, y_res = smote.fit_resample(X_scaled, y)
+
+        model_eval = RandomForestClassifier(n_estimators=100, max_depth=5, class_weight='balanced', random_state=42)
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+        acc = float(cross_val_score(model_eval, X_res, y_res, cv=cv, scoring='accuracy').mean())
+        rec = float(cross_val_score(model_eval, X_res, y_res, cv=cv, scoring='recall').mean())
+        pre = float(cross_val_score(model_eval, X_res, y_res, cv=cv, scoring='precision').mean())
+        f1  = float(cross_val_score(model_eval, X_res, y_res, cv=cv, scoring='f1').mean())
+
+        return {
+            "total_patients": total_patients,
+            "accuracy": round(acc * 100, 1),
+            "recall": round(rec * 100, 1),
+            "precision": round(pre * 100, 1),
+            "f1_score": round(f1 * 100, 1),
+            "positive_outcomes": int(y.sum()),
+            "negative_outcomes": int(len(y) - y.sum()),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
