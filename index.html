@@ -941,7 +941,66 @@
       border-color: var(--danger);
       color: var(--danger);
     }
-    /* Toast Notifications */
+    /* Waking Up Screen */
+    #waking-screen {
+      position: fixed; inset: 0; background: var(--bg); z-index: 99999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 24px;
+    }
+    .waking-logo {
+      font-size: 64px; animation: wakePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes wakePulse {
+      0%,100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(0,242,254,0.3)); }
+      50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(0,242,254,0.8)); }
+    }
+    .waking-title {
+      font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 28px;
+      background: linear-gradient(to right, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .waking-msg {
+      font-family: 'DM Mono', monospace; font-size: 14px; color: var(--muted);
+      animation: blink 1.2s step-end infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .waking-bar-wrap {
+      width: 280px; height: 4px; background: rgba(255,255,255,0.08);
+      border-radius: 2px; overflow: hidden;
+    }
+    .waking-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+    .waking-steps {
+      display: flex; flex-direction: column; gap: 8px; align-items: center;
+    }
+    .waking-step {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted);
+      opacity: 0; transition: opacity 0.5s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .waking-step.active { opacity: 1; color: var(--text); }
+    .waking-step.done { opacity: 0.5; color: #4ade80; }
+    .waking-step .step-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--muted); flex-shrink: 0;
+    }
+    .waking-step.active .step-dot { background: var(--accent); animation: wakePing 1s infinite; }
+    .waking-step.done .step-dot { background: #4ade80; }
+    @keyframes wakePing {
+      0% { box-shadow: 0 0 0 0 rgba(0,242,254,0.6); }
+      100% { box-shadow: 0 0 0 8px rgba(0,242,254,0); }
+    }
+    .waking-skip {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted);
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      padding: 6px 16px; cursor: pointer; transition: all .2s; margin-top: 8px;
+    }
+    .waking-skip:hover { color: var(--text); border-color: var(--border2); }
+  </style>
     .toast-container {
       position: fixed; top: 24px; right: 24px; z-index: 9999;
       display: flex; flex-direction: column; gap: 10px; pointer-events: none;
@@ -994,6 +1053,23 @@
 </head>
 
 <body>
+  <!-- Waking Up Screen -->
+  <div id="waking-screen">
+    <div class="waking-logo">🫁</div>
+    <div class="waking-title">AmbuPredict</div>
+    <div class="waking-bar-wrap">
+      <div class="waking-bar" id="waking-bar"></div>
+    </div>
+    <div class="waking-steps">
+      <div class="waking-step" id="step-1"><div class="step-dot"></div>Initializing AI engine...</div>
+      <div class="waking-step" id="step-2"><div class="step-dot"></div>Loading ML model...</div>
+      <div class="waking-step" id="step-3"><div class="step-dot"></div>Connecting to database...</div>
+      <div class="waking-step" id="step-4"><div class="step-dot"></div>Ready!</div>
+    </div>
+    <div class="waking-msg" id="waking-msg">🤖 Waking up AI engine... please wait</div>
+    <button class="waking-skip" onclick="skipWakingScreen()">Skip → Use Demo Mode</button>
+  </div>
+
   <div class="toast-container" id="toast-container"></div>
   <div class="wrapper">
 
@@ -1541,20 +1617,85 @@
     let histCount = 0;
     let spo2Chart = null;
 
-    // ── API status check ────────────────────────────────────────────────────────
+    // ── Waking Up Screen ──────────────────────────────────────────────────────
+    function skipWakingScreen() {
+      document.getElementById('waking-screen').style.display = 'none';
+      apiOnline = false;
+      document.getElementById('status-text').textContent = 'API Offline — Demo Mode';
+      document.getElementById('demo-banner').style.display = 'flex';
+    }
+
     async function checkStatus() {
+      const screen = document.getElementById('waking-screen');
+      const bar = document.getElementById('waking-bar');
+      const msg = document.getElementById('waking-msg');
+
+      const steps = ['step-1','step-2','step-3','step-4'];
+      const msgs = [
+        '🤖 Waking up AI engine... please wait',
+        '📦 Loading Random Forest model...',
+        '🗄️ Connecting to MongoDB...',
+        '✅ All systems ready!'
+      ];
+      const widths = ['25%','50%','75%','100%'];
+
+      // Animate steps
+      let stepIndex = 0;
+      function nextStep() {
+        if (stepIndex > 0) {
+          document.getElementById(steps[stepIndex-1]).className = 'waking-step done';
+        }
+        if (stepIndex < steps.length) {
+          document.getElementById(steps[stepIndex]).className = 'waking-step active';
+          bar.style.width = widths[stepIndex];
+          msg.textContent = msgs[stepIndex];
+          stepIndex++;
+        }
+      }
+
+      nextStep(); // step 1
+      const stepTimer = setInterval(nextStep, 1200);
+
       try {
-        const r = await fetch(`${API}/`, { signal: AbortSignal.timeout(3000) });
+        const r = await fetch(`${API}/`, { signal: AbortSignal.timeout(15000) });
+        clearInterval(stepTimer);
+
         if (r.ok) {
+          // Complete all steps quickly
+          steps.forEach(s => document.getElementById(s).className = 'waking-step done');
+          bar.style.width = '100%';
+          msg.textContent = '✅ All systems ready!';
           apiOnline = true;
-          document.getElementById('status-dot').classList.add('ok');
-          document.getElementById('status-text').textContent = 'API Connected';
-          document.getElementById('demo-banner').style.display = 'none';
+
+          setTimeout(() => {
+            screen.style.opacity = '0';
+            screen.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+              screen.style.display = 'none';
+              document.getElementById('status-dot').classList.add('ok');
+              document.getElementById('status-text').textContent = 'API Connected';
+              document.getElementById('demo-banner').style.display = 'none';
+              showToast('AI Engine Ready!', 'AmbuPredict is online and connected', 'success');
+            }, 500);
+          }, 800);
         }
       } catch {
+        clearInterval(stepTimer);
         apiOnline = false;
-        document.getElementById('status-text').textContent = 'API Offline — Demo Mode';
-        document.getElementById('demo-banner').style.display = 'flex';
+        msg.textContent = '⚡ Running in Demo Mode';
+        bar.style.width = '100%';
+        bar.style.background = 'var(--warn)';
+
+        setTimeout(() => {
+          screen.style.opacity = '0';
+          screen.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => {
+            screen.style.display = 'none';
+            document.getElementById('status-text').textContent = 'API Offline — Demo Mode';
+            document.getElementById('demo-banner').style.display = 'flex';
+            showToast('Demo Mode Active', 'API is offline. Showing simulated predictions.', 'warn');
+          }, 500);
+        }, 1000);
       }
     }
     checkStatus();
