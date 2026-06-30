@@ -5,6 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AmbuPredict — Ventilation Outcome Predictor</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#00f2fe" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AmbuPredict" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;600;700;800&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
@@ -2330,6 +2338,50 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !document.getElementById('predict-btn').disabled)
         runPrediction();
+    });
+  </script>
+  <script>
+    // ── PWA Service Worker Registration ───────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+
+    // ── Install App Prompt ────────────────────────────────────────────────────
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.createElement('button');
+      installBtn.id = 'pwa-install-btn';
+      installBtn.innerHTML = '📲 Install App';
+      installBtn.style.cssText = `
+        position: fixed; bottom: 20px; right: 20px; z-index: 9998;
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #000; font-family: 'Outfit', sans-serif; font-weight: 700;
+        font-size: 14px; padding: 12px 20px; border: none; border-radius: 50px;
+        cursor: pointer; box-shadow: 0 4px 20px rgba(0,242,254,0.4);
+        animation: pwaFloat 2s ease-in-out infinite;
+      `;
+      const style = document.createElement('style');
+      style.textContent = '@keyframes pwaFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }';
+      document.head.appendChild(style);
+      installBtn.onclick = async () => {
+        installBtn.remove();
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted' && typeof showToast === 'function') {
+          showToast('App Installed!', 'AmbuPredict is now on your home screen', 'success');
+        }
+        deferredPrompt = null;
+      };
+      document.body.appendChild(installBtn);
+    });
+
+    window.addEventListener('appinstalled', () => {
+      const btn = document.getElementById('pwa-install-btn');
+      if (btn) btn.remove();
     });
   </script>
 </body>
