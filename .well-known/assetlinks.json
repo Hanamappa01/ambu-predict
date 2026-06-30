@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.hanamappa01.twa",
+    "sha256_cert_fingerprints": ["31:E7:C3:5F:A9:B5:E9:1F:6A:21:28:03:F0:E7:A3:4C:61:01:F4:94:3B:01:29:C6:2F:EA:3B:04:78:25:DB:21"]
+  }
+}]
